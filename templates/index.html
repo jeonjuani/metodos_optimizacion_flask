@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Métodos Numéricos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-2.26.0.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+    <div class="header-inner">
+        <div class="logo-area">
+            <div class="logo-badge">MN</div>
+            <div>
+                <div class="logo-title">Optimización</div>
+                <div class="logo-sub">Métodos Numéricos</div>
+            </div>
+        </div>
+        <nav class="method-nav">
+            <span class="nav-item active" onclick="cambiarMetodo('biseccion', event)">Bisección</span>
+            <span class="nav-item" onclick="cambiarMetodo('regla_falsa', event)">Falsa Posición</span>
+            <span class="nav-item" onclick="cambiarMetodo('newton_raphson', event)">Newton-Raphson</span>
+            <span class="nav-item" onclick="cambiarMetodo('newton_optimo', event)">Newton Óptimo</span>
+            <span class="nav-item" onclick="cambiarMetodo('razon_dorada', event)">Razón Dorada</span>
+            <span class="nav-item" onclick="cambiarMetodo('interpolacion_cuadratica', event)">Interpolación Cuadrática</span>
+            <span class="nav-item" onclick="cambiarMetodo('busqueda_aleatoria', event)">Búsqueda Aleatoria</span>
+        </nav>
+    </div>
+</header>
+
+<main class="main-grid">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="card">
+            <div class="card-header">
+                <div class="method-tag">MÉTODO</div>
+                <h2 class="method-name" id="method-name">Bisección</h2>
+                <p class="method-desc" id="method-desc">Búsqueda incremental por corte binario. Divide el intervalo a la mitad en cada iteración hasta localizar la raíz.</p>
+            </div>
+
+            <div class="form-section">
+                <label class="form-label">
+                    <span class="label-text">Función f(x)</span>
+                    <span class="label-hint">Soporta: 3x^2, sin(x), exp(x), log(x), sqrt(x), pi, e</span>
+                </label>
+                <div class="input-wrapper">
+                    <span class="input-prefix">f(x) =</span>
+                    <input type="text" id="funcion" class="form-input" placeholder="x^3 - x - 2" value="x^3 - x - 2">
+                </div>
+            </div>
+
+            <div class="form-row" id="row-interval">
+                <div class="form-section half">
+                    <label class="form-label"><span class="label-text">x<sub>l</sub> (inferior)</span></label>
+                    <input type="number" id="xl" class="form-input" step="any" value="1">
+                </div>
+                <div class="form-section half">
+                    <label class="form-label"><span class="label-text">x<sub>u</sub> (superior)</span></label>
+                    <input type="number" id="xu" class="form-input" step="any" value="2">
+                </div>
+            </div>
+            <div class="form-row" id="row-x0" style="display: none;">
+                <div class="form-section full">
+                    <label class="form-label"><span class="label-text">x<sub>0</sub> (inicial)</span></label>
+                    <input type="number" id="x0" class="form-input" step="any" value="1">
+                </div>
+            </div>
+            <div class="form-row" id="row-x012" style="display: none;">
+                <div class="form-section third">
+                    <label class="form-label"><span class="label-text">x<sub>0</sub></span></label>
+                    <input type="number" id="x0_iq" class="form-input" step="any" value="0">
+                </div>
+                <div class="form-section third">
+                    <label class="form-label"><span class="label-text">x<sub>1</sub></span></label>
+                    <input type="number" id="x1_iq" class="form-input" step="any" value="1">
+                </div>
+                <div class="form-section third">
+                    <label class="form-label"><span class="label-text">x<sub>2</sub></span></label>
+                    <input type="number" id="x2_iq" class="form-input" step="any" value="2">
+                </div>
+            </div>
+
+            <div class="form-row" id="row-multivariable" style="display: none;">
+                <div class="form-section full">
+                    <label class="form-label"><span class="label-text">Variables y Rangos (ej: x[-10,10] y[-5,5])</span></label>
+                    <input type="text" id="multivariable-vars" class="form-input" placeholder="x[-10,10] y[-5,5]" value="x[-10,10] y[-5,5]">
+                    <small class="form-hint">Formato: variable[min,max] separados por espacio</small>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-section half">
+                    <label class="form-label"><span class="label-text">Tolerancia (%)</span></label>
+                    <input type="number" id="tolerancia" class="form-input" step="any" value="0.001">
+                </div>
+                <div class="form-section half">
+                    <label class="form-label"><span class="label-text">Máx. iteraciones</span></label>
+                    <input type="number" id="max_iter" class="form-input" value="100">
+                </div>
+            </div>
+            <div class="form-row" id="row-objetivo">
+                <div class="form-section full">
+                    <label class="form-label"><span class="label-text">Objetivo</span></label>
+                    <select id="objetivo" class="form-input">
+                        <option value="min">Minimizar</option>
+                        <option value="max">Maximizar</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn-calcular" onclick="calcular()">
+                <span class="btn-icon">▶</span>
+                Calcular Raíz
+            </button>
+
+            <div id="resultado-box" class="resultado-box hidden">
+                <div id="resultado-label" class="resultado-label">Raíz aproximada</div>
+                <div id="resultado-valor" class="resultado-valor">—</div>
+                <div id="resultado-iters" class="resultado-meta">— iteraciones</div>
+            </div>
+
+            <div id="error-box" class="error-box hidden">
+                <div class="error-icon">⚠</div>
+                <div id="error-msg"></div>
+            </div>
+        </div>
+
+        <!-- Algoritmo dinámico -->
+        <div class="card theory-card">
+            <h3 class="theory-title">Algoritmo</h3>
+            <div id="algo-steps" class="algo-steps">
+                <!-- Se actualiza por JS al cambiar de método -->
+            </div>
+        </div>
+    </aside>
+
+    <!-- Contenido principal -->
+    <section class="content">
+        <div class="charts-row">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <span class="chart-label">GRÁFICA DE LA FUNCIÓN</span>
+                    <span class="chart-sub" id="funcion-display">f(x) = —</span>
+                    <span id="optimo-indicator" class="chart-note"></span>
+                </div>
+                <div id="chart-funcion" class="chart-area">
+                    <div class="chart-placeholder">
+                        <div class="placeholder-icon">𝑓</div>
+                        <p>Ingresa los parámetros y presiona <strong>Calcular</strong></p>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-header">
+                    <span class="chart-label">ERROR RELATIVO (%)</span>
+                    <span class="chart-sub">Convergencia por iteración</span>
+                </div>
+                <div id="chart-error" class="chart-area">
+                    <div class="chart-placeholder">
+                        <div class="placeholder-icon">ε</div>
+                        <p>El gráfico de error aparecerá aquí</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <div class="table-header">
+                <div>
+                    <span class="chart-label">TABLA DE ITERACIONES</span>
+                    <span id="iter-count" class="iter-badge hidden"></span>
+                </div>
+                <button class="btn-export hidden" id="btn-export" onclick="exportarCSV()">⬇ Exportar CSV</button>
+            </div>
+            <div class="table-wrapper">
+                <table class="iter-table" id="tabla-iteraciones">
+                    <thead>
+                        <tr>
+                            <th>Iter.</th>
+                            <th>x<sub>l</sub></th>
+                            <th>x<sub>u</sub></th>
+                            <th>x<sub>r</sub></th>
+                            <th>f(x<sub>l</sub>)</th>
+                            <th>f(x<sub>r</sub>)</th>
+                            <th>Error (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-body">
+                        <tr class="empty-row">
+                            <td colspan="7">Aún no hay datos. Ingresa la función y los parámetros para comenzar.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
