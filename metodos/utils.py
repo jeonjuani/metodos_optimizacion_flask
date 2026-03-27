@@ -1,24 +1,9 @@
-"""
-utils.py — Utilidades compartidas entre todos los métodos numéricos.
-"""
 import math
 import re
 import numpy as np
 
 
 def _preprocesar(expr):
-    """
-    Limpia y normaliza la expresión antes de evaluarla:
-      - Quita espacios:                '2 sin(x)' -> '2sin(x)'
-      - Coma decimal  -> punto:          '3,14'  -> '3.14'
-      - Potencia ^    -> **:             'x^2'   -> 'x**2'
-      - Multiplicacion implicita:
-            '3x'         -> '3*x'
-            '2pi'        -> '2*pi'
-            '(x+1)(x-1)' -> '(x+1)*(x-1)'
-            'x(x+1)'     -> 'x*(x+1)'
-      - Funciones -> math.funciones:    'sin(x)' -> 'math.sin(x)'
-    """
     expr = re.sub(r'\s+', '', expr)
     expr = expr.replace(',', '.')
     expr = expr.replace('^', '**')
@@ -63,10 +48,6 @@ def evaluar_funcion(expr, x):
 
 
 def generar_puntos_grafica(f_expr, x_min, x_max, n=400):
-    """
-    Genera los puntos (x, y) para graficar f_expr en [x_min, x_max].
-    Retorna listas JSON-serializables (None donde la funcion no es finita).
-    """
     margen = abs(x_max - x_min) * 0.5
     x_vals = np.linspace(x_min - margen, x_max + margen, n).tolist()
     y_vals = []
@@ -80,19 +61,6 @@ def generar_puntos_grafica(f_expr, x_min, x_max, n=400):
 
 
 def evaluar_funcion_multivariable(expr, variables_dict):
-    """
-    Evalúa una expresión con múltiples variables.
-    
-    Args:
-        expr (str): Expresión matemática (ej: "x**2 + y**2")
-        variables_dict (dict): Diccionario {variable: valor, ...} (ej: {'x': 1.5, 'y': 2.0})
-    
-    Returns:
-        float: Valor de la función evaluada
-    
-    Raises:
-        ValueError: Si hay error en la evaluación
-    """
     try:
         expr_proc = _preprocesar(expr)
         # Crear namespace con todas las variables

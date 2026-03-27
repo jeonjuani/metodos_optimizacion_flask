@@ -1,18 +1,7 @@
-"""
-biseccion.py — Método de bisección (corte binario / Bolzano).
-
-Uso desde app.py:
-    from metodos.biseccion import ejecutar
-    resultado = ejecutar(f_expr, xl, xu, tol, max_iter)
-"""
 from metodos.utils import evaluar_funcion, generar_puntos_grafica
 
 
 def _iterar(f_expr, xl, xu, tol, max_iter):
-    """
-    Núcleo del algoritmo. Retorna la lista de iteraciones.
-    Cada elemento: {iteracion, xl, xu, xr, f_xl, f_xr, error}.
-    """
     iteraciones = []
     xr_anterior = None
 
@@ -62,10 +51,6 @@ def _iterar(f_expr, xl, xu, tol, max_iter):
 
 
 def ejecutar(f_expr, xl, xu, tol=1e-6, max_iter=100):
-    """
-    Punto de entrada principal. Ejecuta el método y devuelve el
-    diccionario completo que la ruta Flask retornará como JSON.
-    """
     iteraciones = _iterar(f_expr, xl, xu, tol, max_iter)
     raiz = iteraciones[-1]["xr"]
 

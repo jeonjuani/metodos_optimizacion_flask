@@ -1,21 +1,7 @@
-"""
-regla_falsa.py — Método de la falsa posición (regula falsi / interpolación lineal).
-
-Fórmula:
-    xr = xu - f(xu)*(xl - xu) / (f(xl) - f(xu))
-
-Uso desde app.py:
-    from metodos import regla_falsa
-    resultado = regla_falsa.ejecutar(f_expr, xl, xu, tol, max_iter)
-"""
 from metodos.utils import evaluar_funcion, generar_puntos_grafica
 
 
 def _iterar(f_expr, xl, xu, tol, max_iter):
-    """
-    Núcleo del algoritmo de falsa posición.
-    Retorna lista de iteraciones con: iteracion, xl, xu, xr, f_xl, f_xr, error.
-    """
     iteraciones = []
     xr_anterior = None
 
@@ -75,10 +61,6 @@ def _iterar(f_expr, xl, xu, tol, max_iter):
 
 
 def ejecutar(f_expr, xl, xu, tol=1e-6, max_iter=100):
-    """
-    Punto de entrada principal.
-    Devuelve el diccionario completo que Flask retornará como JSON.
-    """
     iteraciones = _iterar(f_expr, xl, xu, tol, max_iter)
     raiz = iteraciones[-1]["xr"]
 

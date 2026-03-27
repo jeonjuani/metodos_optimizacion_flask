@@ -1,30 +1,8 @@
-"""
-busqueda_aleatoria.py — Método de Búsqueda Aleatoria Multidimensional.
-
-Este método evalúa la función en puntos generados aleatoriamente dentro
-del espacio de búsqueda especificado, almacenando el óptimo encontrado.
-
-Uso desde app.py:
-    from metodos.busqueda_aleatoria import ejecutar
-    resultado = ejecutar(f_expr, variables, rangos, max_iter, maximizar)
-    
-Ejemplo:
-    f(x,y) = x**2 + y**2
-    variables = ['x', 'y']
-    rangos = [[-5, 5], [-5, 5]]
-    max_iter = 1000
-"""
 import random
 from metodos.utils import evaluar_funcion_multivariable
 
 
 def _iterar(f_expr, variables, rangos, max_iter, maximizar):
-    """
-    Genera puntos aleatorios en el espacio de búsqueda y compara
-    con el óptimo encontrado hasta ese momento.
-    
-    Retorna lista de iteraciones con la mejor solución encontrada.
-    """
     iteraciones = []
     
     # Validar consistencia
@@ -73,10 +51,6 @@ def _iterar(f_expr, variables, rangos, max_iter, maximizar):
 
 
 def _generar_superficie_3d(f_expr, variables, rangos, resolucion=45):
-    """
-    Genera malla x/y/z para visualizar f(var1,var2) como superficie 3D.
-    Solo aplica cuando hay exactamente 2 variables.
-    """
     if len(variables) != 2 or len(rangos) != 2:
         return None
 
@@ -116,27 +90,6 @@ def _generar_superficie_3d(f_expr, variables, rangos, resolucion=45):
 
 
 def ejecutar(f_expr, variables, rangos, max_iter=1000, maximizar=False):
-    """
-    Ejecuta búsqueda aleatoria multidimensional.
-    
-    Args:
-        f_expr (str): Expresión de la función (ej: "x**2 + y**2")
-        variables (list): Lista de nombres de variables (ej: ['x', 'y'])
-        rangos (list): Lista de rangos [min, max] para cada variable
-        max_iter (int): Número de iteraciones (puntos a evaluar)
-        maximizar (bool): True para maximizar, False para minimizar
-    
-    Returns:
-        dict: {
-            'ok': bool,
-            'raiz': float,  // mejor valor encontrado (valor de función mínimo/máximo)
-            'punto': dict,  // punto óptimo {x: valor, y: valor, ...}
-            'iteraciones': list,  // historial de puntos evaluados
-            'total_iteraciones': int,
-            'grafica_funcion': None,  // no hay gráfica 2D para multidimensional
-            'grafica_error': None,    // no hay error evolutivo
-        }
-    """
     try:
         iteraciones = _iterar(f_expr, variables, rangos, max_iter, maximizar)
         
